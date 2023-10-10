@@ -8,14 +8,25 @@ const todos = [
 
 const server = http.createServer((req, res) => {
 
+    console.log(req.body)
+
+    let body = []
+    req
+        .on('data', (chunk) => {
+            body.push(chunk)
+        })
+        .on('end', () => {
+            body = Buffer.concat(body).toString()
+            console.log(body)
+        })
+
     res.writeHead(404, {
         'Content-Type': 'application/json',
         'X-Powered-By': 'Node.js'
     })
     res.end(JSON.stringify({
-        success: false,
-        error: "Not Found",
-        data: null
+        success: true,
+        data: todos
     }))
 })
 
