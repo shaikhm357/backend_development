@@ -25,7 +25,7 @@ if (process.env.NODE_ENV == "development") {
 }
 
 // mount routers
-app.use('/api/v1/bootcamp', bootcamp)
+app.use('/api/v1/bootcamps', bootcamp)
 
 // errorHandler
 app.use(errorHandler)

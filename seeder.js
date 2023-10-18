@@ -9,7 +9,12 @@ dotenv.config({ path: './config/config.env' })
 const Bootcamp = require('./models/Bootcamp')
 
 // connect DB 
-mongoosoe.connect(process.env.MONGO_URI)
+mongoosoe.connect(process.env.MONGO_URI,{
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+})
 
 // Read json file 
 const bootcamp = JSON.parse(fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8'))
