@@ -11,12 +11,41 @@ const geocoder = require('../utils/geocoder')
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
 
     let query
-    let queryStr = JSON.stringify(req.query)
+
+    // Copy req.query 
+    const reqQuery = { ...req.query }
+
+    // field to exclude 
+    const removeField = ['select', 'sort']
+    removeField.forEach(param => delete reqQuery[param])
+
+    console.log(reqQuery)
+
+    let queryStr = JSON.stringify(reqQuery)
+
+    // create operator ($gt, $gte etc) 
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
+
+    // finding resource 
     query = Bootcamp.find(JSON.parse(queryStr))
+
+    // select field 
+    if (req.query.select) {
+        const fields = req.query.select.split(',').join(' ')
+        query = query.select(fields)
+        console.log(fields)
+    }
+
+    // sort 
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ')
+        query = query.sort(sortBy)
+    }else{
+        query = query.sort('-createdAt')
+    }
+
     const bootcamps = await query
-    console.log(queryStr)
-    // const bootcamps = await Bootcamp.find()
+
     res.status(200).json({
         success: true,
         count: bootcamps.length,
