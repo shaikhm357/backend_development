@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
 const geocoder = require('../utils/geocoder')
+const Course = require('./Course')
 
 const BootcampSchema = new mongoose.Schema(
     {
@@ -134,6 +135,21 @@ BootcampSchema.pre('save', async function (next) {
     // Do not save address in DB 
     this.address = undefined
 
+    next()
+})
+
+// Reverse populate with virtuals 
+BootcampSchema.virtual('courses', {
+    ref: 'Course',
+    localField: '_id',
+    foreignField: 'bootcamp',
+    justOne: false
+})
+
+BootcampSchema.pre('deleteOne',{ document: false, query: true }, async function (next) {
+    const bootcampId = this.getFilter()._id;
+    console.log(`Delete all the courses related to the bootcamp of id ${bootcampId}`)
+    await Course.deleteMany({ bootcamp: bootcampId })
     next()
 })
 

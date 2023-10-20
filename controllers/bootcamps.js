@@ -27,7 +27,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
 
     // finding resource 
-    query = Bootcamp.find(JSON.parse(queryStr))
+    query = Bootcamp.find(JSON.parse(queryStr)).populate('courses')
 
     // select field 
     if (req.query.select) {
@@ -40,7 +40,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     if (req.query.sort) {
         const sortBy = req.query.sort.split(',').join(' ')
         query = query.sort(sortBy)
-    }else{
+    } else {
         query = query.sort('-createdAt')
     }
 
@@ -104,7 +104,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 
 exports.deleteBootcamp = async (req, res, next) => {
     try {
-        const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id)
+        const bootcamp = await Bootcamp.deleteOne({ _id: req.params.id })
         if (!bootcamp) {
             return res.status(400).json({ success: false })
         }
