@@ -1,5 +1,13 @@
 const express = require('express')
-const { getBootcamps, getBootcamp, createBootcamp, updateBootcamp, deleteBootcamp, getBootcampInRadius } = require('../controllers/bootcamps.js')
+const {
+    getBootcamps,
+    getBootcamp,
+    createBootcamp,
+    updateBootcamp,
+    deleteBootcamp,
+    getBootcampInRadius,
+    bootcampPhotoUpload
+} = require('../controllers/bootcamps.js')
 
 // include other resource routes 
 const courseRouter = require('./courses.js')
@@ -24,5 +32,8 @@ router
     .put(updateBootcamp)
     .delete(deleteBootcamp)
 
+router
+    .route('/:id/photo')
+    .put(bootcampPhotoUpload)
 
 module.exports = router
