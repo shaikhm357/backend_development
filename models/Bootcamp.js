@@ -146,7 +146,7 @@ BootcampSchema.virtual('courses', {
     justOne: false
 })
 
-BootcampSchema.pre('deleteOne',{ document: false, query: true }, async function (next) {
+BootcampSchema.post('deleteOne', { document: false, query: true }, async function (next) {
     const bootcampId = this.getFilter()._id;
     console.log(`Delete all the courses related to the bootcamp of id ${bootcampId}`)
     await Course.deleteMany({ bootcamp: bootcampId })

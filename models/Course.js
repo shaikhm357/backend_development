@@ -1,3 +1,4 @@
+const { blue } = require('colors')
 const mongoose = require('mongoose')
 
 const CourseSchema = new mongoose.Schema({
@@ -15,7 +16,7 @@ const CourseSchema = new mongoose.Schema({
         required: [true, 'Please add a number of weeks']
     },
     tuition: {
-        type: String,
+        type: Number,
         required: [true, 'Please add a tution cost']
     },
     minimumSkill: {
@@ -39,5 +40,54 @@ const CourseSchema = new mongoose.Schema({
 
 })
 
+//statict method to get Avg of course tuitions
+CourseSchema.static('getAverageCost', async function (bootcampId) {
+    console.log(`Calculating avgCost...`, blue)
+    const obj = await this.aggregate([
+        {
+            $match: { bootcamp: bootcampId }
+        },
+        {
+            $group: {
+                _id: '$bootcamp',
+                averageCost: { $avg: '$tuition' }
+            }
+        }
+    ])
+    try {
+        await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
+            averageCost: Math.ceil(obj[0].averageCost / 10) * 10
+        })
+    } catch (err) {
+        console.log(err)
+    }
+})
+
+// CourseSchema.static.getAverageCost = async function ( bootcampId) {
+//     console.log(`Calculating avgCost...`, blue)
+//     const obj = await this.aggregate([
+//         {
+//             $match: { bootcamp: bootcampId }
+//         },
+//         {
+//             $group: {
+//                 _id: '$bootcampId',
+//                 averageCost: { $avg: '$tuition' }
+//             }
+//         }
+//     ])
+//     console.log(obj)
+// }
+
+// calculate averageCost after save 
+CourseSchema.post('save', async function () {
+    await this.constructor.getAverageCost(this.bootcamp)
+})
+
+// calculate averageCost before delete 
+CourseSchema.post('deleteOne', { document: true, query: false }, async function () {
+    console.log(`executing delete One ................`)
+    await this.constructor.getAverageCost(this.bootcamp)
+})
 
 module.exports = mongoose.model('Course', CourseSchema)
