@@ -10,24 +10,17 @@ const ErrorResponse = require('../utils/errorResponse')
 // @access Public
 
 exports.getCourses = asyncHandler(async (req, res, next) => {
-    let query
+
 
     if (req.params.bootcampId) {
-        query = Course.find({ bootcamp: req.params.bootcampId })
+
+        const courses = await Course.find({ bootcamp: req.params.bootcampId })
+
+        res.status(200).json({ success: true, count: courses.length, data: courses })
+
     } else {
-        query = Course.find().populate({
-            path: 'bootcamp',
-            select: 'name description'
-        })
+        res.status(200).json(res.advanceResults)
     }
-
-    const courses = await query
-
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses
-    })
 })
 
 // @desc   Get course
@@ -97,7 +90,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`No course of id ${req.params.bootcampId}`, 400))
     }
     // delete course 
-    await course.deleteOne({_id:req.params.id})
+    await course.deleteOne({ _id: req.params.id })
 
     res.status(201).json({ success: true, data: {} })
 })
