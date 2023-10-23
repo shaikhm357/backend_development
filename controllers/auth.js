@@ -6,5 +6,14 @@ const User = require('../models/User')
 // @access     Public
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
-    res.status(200).json({ success: true })
+    const { name, email, password, role } = req.body
+
+    // create user 
+    const user = await User.create({
+        name,
+        password,
+        email,
+        role
+    })
+    res.status(200).json({ success: true, data: user })
 })
