@@ -41,6 +41,7 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
 
+    // console.log(req.user)
     const bootcamp = await Bootcamp.create(req.body)
     res.status(201).json({ success: true, data: bootcamp })
 })
@@ -90,7 +91,7 @@ exports.getBootcampInRadius = async (req, res, next) => {
         const loc = await geocoder.geocode(zipcode)
         const lat = loc[0].latitude
         const lng = loc[0].longitude
-        console.log(lat, lng)
+        // console.log(lat, lng)
         // calc radius using radians
         // devide dist by radius of earth
         // Earth radius = 3,963 mi / 6378 km 

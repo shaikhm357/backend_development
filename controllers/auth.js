@@ -69,3 +69,13 @@ const sentTokenResponse = (user, statusCode, res) => {
         .cookie('token', token, options)
         .json({ success: true, token })
 }
+
+// @dec        Get current loged in user
+// @route      Post /api/v1/auth/me
+// @access     Private
+
+exports.getMe = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+
+    res.status(200).json({ success: true, data: user })
+})
