@@ -26,7 +26,7 @@ router
 
 router
     .route('/')
-    .get(advanceResults(Bootcamp, 'courses'), getBootcamps)
+    .get(advanceResults(Bootcamp, 'courses user'), getBootcamps)
     .post(protect, authorize('publisher', 'admin'), createBootcamp)
 
 router
