@@ -50,6 +50,31 @@ exports.login = asyncHandler(async (req, res, next) => {
     sentTokenResponse(user, 200, res)
 })
 
+// @dec        Get current loged in user
+// @route      Post /api/v1/auth/me
+// @access     Private
+
+exports.getMe = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+
+    res.status(200).json({ success: true, data: user })
+})
+
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email })
+
+    if (!user) {
+        return next(new ErrorResponse(`There is no user with that email`, 404))
+    }
+
+    const resetToken = user.getResetPasswordToken()
+
+    user.save({validateBeforeSave:false})
+
+    res.status(200).json({ success: true, data: user })
+
+})
+
 // Get token from model, create cookie and send response 
 
 const sentTokenResponse = (user, statusCode, res) => {
@@ -69,13 +94,3 @@ const sentTokenResponse = (user, statusCode, res) => {
         .cookie('token', token, options)
         .json({ success: true, token })
 }
-
-// @dec        Get current loged in user
-// @route      Post /api/v1/auth/me
-// @access     Private
-
-exports.getMe = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user._id)
-
-    res.status(200).json({ success: true, data: user })
-})
