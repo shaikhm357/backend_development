@@ -1,7 +1,7 @@
 const express = require('express')
-const { registerUser, login, getMe, forgotPassword } = require('../controllers/auth')
+const { registerUser, login, getMe, forgotPassword, resetPassword } = require('../controllers/auth')
 const router = express.Router()
-const {protect} = require('../middleware/auth')
+const { protect } = require('../middleware/auth')
 
 router
     .route('/register')
@@ -13,5 +13,6 @@ router
 
 router.get('/me', protect, getMe)
 router.post('/forgotPassword', forgotPassword)
+router.put('/resetPassword/:resetToken', resetPassword)
 
 module.exports = router

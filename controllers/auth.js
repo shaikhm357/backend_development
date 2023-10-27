@@ -1,4 +1,4 @@
-
+const crypto = require('crypto')
 const asyncHandler = require('../middleware/async')
 const User = require('../models/User')
 const ErrorResponse = require('../utils/errorResponse')
@@ -61,6 +61,9 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: user })
 })
 
+// @dec        Forgot Password
+// @route      Post /api/v1/auth/forgotPassword
+// @access     Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email })
 
@@ -69,12 +72,12 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     }
 
     const resetToken = await user.getResetPasswordToken()
-    console.log(resetToken)
+    // console.log(resetToken)
 
     user.save({ validateBeforeSave: false })
 
     // create reset url
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetPassword/${resetToken}`
 
     const message = `You are receiving this email because you has requested the reset of a password. 
     Please make a PUT request to: \n\n ${resetUrl}`
@@ -91,6 +94,32 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
         return next(new ErrorResponse(`Email could not be sent`, 500))
     }
+})
+
+// @dec        Reset Password
+// @route      PUT /api/v1/auth/resetPassword/:restToken
+// @access     Public
+
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+
+    // Get hased token 
+    const resetPasswordToken = crypto.createHash('sha256').update(req.params.resetToken).digest('hex')
+    console.log(resetPasswordToken)
+
+    const user = await User.findOne({ resetPasswordToken, resetPasswordExpire: { $gt: Date.now() } })
+
+    if (!user) {
+        return next(new ErrorResponse(`Invalid Token ${req.params.resetToken}`, 400))
+    }
+
+    user.password = req.body.password
+    user.resetPasswordExpire = undefined
+    user.resetPasswordToken = undefined
+
+    // update in db
+    user.save()
+
+    sentTokenResponse(user, 200, res)
 })
 
 // Get token from model, create cookie and send response 
