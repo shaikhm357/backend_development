@@ -61,6 +61,25 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: user })
 })
 
+// @dec        Update loged in user details
+// @route      PUT /api/v1/auth/updatedetails
+// @access     Private
+
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+
+    const fieldsToUpdate = {
+        name: req.body.name,
+        email: req.body.email
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, fieldsToUpdate, {
+        new: true,
+        runValidators: true
+    })
+
+    res.status(200).json({ success: true, data: user })
+})
+
 // @dec        Forgot Password
 // @route      Post /api/v1/auth/forgotPassword
 // @access     Public
