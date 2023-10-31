@@ -80,6 +80,26 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: user })
 })
 
+// @dec        update password
+// @route      PUT /api/v1/auth/updatepassword
+// @access     Private
+
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id).select('+password')
+
+    // check current password
+    if (!(await user.matchPassword(req.body.currentPassword))) {
+        return next(new ErrorResponse(`Password is incorrect`, 401))
+    }
+
+    user.password = req.body.newPassword;
+
+    await user.save()
+
+    sentTokenResponse(user, 200, res)
+})
+
 // @dec        Forgot Password
 // @route      Post /api/v1/auth/forgotPassword
 // @access     Public
