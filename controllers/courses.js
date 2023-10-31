@@ -16,7 +16,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
 
         const courses = await Course.find({ bootcamp: req.params.bootcampId })
 
-        res.status(200).json({ success: true, count: courses.length, data: courses })
+        return res.status(200).json({ success: true, count: courses.length, data: courses })
 
     } else {
         res.status(200).json(res.advanceResults)
@@ -105,8 +105,8 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`No course of id ${req.params.bootcampId}`, 400))
     }
 
-     // make sure user is the course owner 
-     if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    // make sure user is the course owner 
+    if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
         return next(new ErrorResponse(`User ${req.user.id} not authorized to delete course ${course._id}`, 401))
     }
 
