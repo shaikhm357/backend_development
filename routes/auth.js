@@ -1,5 +1,5 @@
 const express = require('express')
-const { registerUser, login, getMe, forgotPassword, resetPassword, updateDetails, updatePassword } = require('../controllers/auth')
+const { registerUser, login, getMe, forgotPassword, resetPassword, updateDetails, updatePassword, logout } = require('../controllers/auth')
 const router = express.Router()
 const { protect } = require('../middleware/auth')
 
@@ -10,6 +10,8 @@ router
 router
     .route('/login')
     .post(login)
+
+router.get('/logout', logout)
 
 router.get('/me', protect, getMe)
 router.put('/updatedetails', protect, updateDetails)
